@@ -1,7 +1,8 @@
 # Infrastructure Automation using Terraform and Ansible 🧰 ⚙️
 
 This repository is part of a larger DevOps Project: 
-Week 4 - GitOps-Based Kubernetes Deployment, focusing on automating infrastructure provisioning and configuration using Terraform and Ansible.
+
+**Week 4 - GitOps-Based Kubernetes Deployment, focusing on automating infrastructure provisioning and configuration using Terraform and Ansible.**
 **Full Stack Application with Monitoring and Logging ⚙️ 📊 🔥**
 [**Repo Here**](https://github.com/kapilkumaria/cv-challenge-04)  
 
