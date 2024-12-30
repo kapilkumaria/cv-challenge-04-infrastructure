@@ -1,6 +1,6 @@
 provider "aws" {
-  profile = myAWS
-  region = var.aws_region  
+  region = "us-east-1"
+  profile = "MyAWS"
 }
 
 # VPC
@@ -12,6 +12,8 @@ resource "aws_vpc" "main" {
     Name = var.vpc_name
   }
 }
+
+data "aws_availability_zones" "available" {}
 
 # Subnets
 resource "aws_subnet" "public" {
@@ -109,7 +111,26 @@ resource "aws_iam_role_policy_attachment" "eks_node" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
-# EKS Node Group
+# # EKS Node Group
+# resource "aws_eks_node_group" "main" {
+#   cluster_name    = aws_eks_cluster.main.name
+#   node_group_name = var.eks_node_group_name
+#   node_role_arn   = aws_iam_role.eks_node.arn
+
+#   subnet_ids = aws_subnet.public.*.id
+
+#   scaling_config {
+#     desired_size = var.node_desired_size
+#     max_size     = var.node_max_size
+#     min_size     = var.node_min_size
+#   }
+
+#   instance_types = var.instance_types
+#   tags = {
+#     Name = var.eks_node_group_name
+#   }
+# }
+
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = var.eks_node_group_name
@@ -124,6 +145,7 @@ resource "aws_eks_node_group" "main" {
   }
 
   instance_types = var.instance_types
+  ami_type       = "AL2_x86_64" # Amazon Linux 2 EKS Optimized AMI
   tags = {
     Name = var.eks_node_group_name
   }
