@@ -1,4 +1,4 @@
-aws_region          = "us-west-2"
+aws_region          = "us-east-1"
 vpc_cidr            = "10.1.0.0/16"
 vpc_name            = "eks-vpc-dev"
 subnet_count        = 2

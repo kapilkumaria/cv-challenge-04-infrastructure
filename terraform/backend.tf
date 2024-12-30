@@ -5,6 +5,6 @@ terraform {
     region         = "us-east-1"
     dynamodb_table = "cv-challenge04-terraform-locks"
     encrypt        = true
-    profile        = "myAWS"
+    profile        = "MyAWS"
   }
 }
