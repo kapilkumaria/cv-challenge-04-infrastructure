@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region  = "us-east-1"
   profile = "MyAWS"
 }
 
@@ -13,6 +13,7 @@ resource "aws_vpc" "main" {
   }
 }
 
+# Data Source for Availability Zones
 data "aws_availability_zones" "available" {}
 
 # Subnets
@@ -84,10 +85,33 @@ resource "aws_eks_cluster" "main" {
   vpc_config {
     subnet_ids = aws_subnet.public.*.id
   }
+
+  enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+
   tags = {
     Name = var.eks_cluster_name
   }
 }
+
+# resource "aws_eks_cluster" "main" {
+#   name     = var.eks_cluster_name
+#   role_arn = aws_iam_role.eks_cluster.arn
+
+#   vpc_config {
+#     subnet_ids = aws_subnet.public.*.id
+#   }
+
+#   logging {
+#     cluster_logging {
+#       enabled = true
+#       types   = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+#     }
+#   }
+
+#   tags = {
+#     Name = var.eks_cluster_name
+#   }
+# }
 
 # Node IAM Role
 resource "aws_iam_role" "eks_node" {
@@ -111,26 +135,17 @@ resource "aws_iam_role_policy_attachment" "eks_node" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
-# # EKS Node Group
-# resource "aws_eks_node_group" "main" {
-#   cluster_name    = aws_eks_cluster.main.name
-#   node_group_name = var.eks_node_group_name
-#   node_role_arn   = aws_iam_role.eks_node.arn
+resource "aws_iam_role_policy_attachment" "eks_node_ecr" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
 
-#   subnet_ids = aws_subnet.public.*.id
+resource "aws_iam_role_policy_attachment" "eks_node_cni" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+}
 
-#   scaling_config {
-#     desired_size = var.node_desired_size
-#     max_size     = var.node_max_size
-#     min_size     = var.node_min_size
-#   }
-
-#   instance_types = var.instance_types
-#   tags = {
-#     Name = var.eks_node_group_name
-#   }
-# }
-
+# EKS Node Group
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = var.eks_node_group_name
@@ -146,6 +161,7 @@ resource "aws_eks_node_group" "main" {
 
   instance_types = var.instance_types
   ami_type       = "AL2_x86_64" # Amazon Linux 2 EKS Optimized AMI
+
   tags = {
     Name = var.eks_node_group_name
   }
