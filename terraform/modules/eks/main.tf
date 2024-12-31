@@ -93,26 +93,6 @@ resource "aws_eks_cluster" "main" {
   }
 }
 
-# resource "aws_eks_cluster" "main" {
-#   name     = var.eks_cluster_name
-#   role_arn = aws_iam_role.eks_cluster.arn
-
-#   vpc_config {
-#     subnet_ids = aws_subnet.public.*.id
-#   }
-
-#   logging {
-#     cluster_logging {
-#       enabled = true
-#       types   = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
-#     }
-#   }
-
-#   tags = {
-#     Name = var.eks_cluster_name
-#   }
-# }
-
 # Node IAM Role
 resource "aws_iam_role" "eks_node" {
   name = var.eks_node_role_name
