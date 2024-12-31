@@ -41,3 +41,14 @@ variable "instance_types" {
   type        = list(string)
   default     = ["t3.medium"]
 }
+
+variable "key_pair" {
+  description = "The name of the SSH key pair to use for the bastion host."
+  type        = string
+}
+
+variable "instance_type" {
+  description = "The EC2 instance type for the bastion host."
+  type        = string
+  default    = "t3.micro"
+}

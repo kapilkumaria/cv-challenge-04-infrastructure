@@ -8,3 +8,12 @@ module "eks" {
   node_min_size    = var.node_min_size
   instance_types   = var.instance_types
 }
+
+module "bastion" {
+  source        = "./modules/bastion"
+  vpc_id        = module.eks.vpc_id          # Reference EKS module output
+  subnet_id     = module.eks.subnet_ids[0]   # Use the first public subnet
+  key_pair      = module.bastion.bastion_private_key   # SSH key pair for bastion
+  instance_type = var.instance_type          # Bastion instance type
+  allowed_cidr  = module.eks.vpc_cidr        # Reference the VPC CIDR from the EKS module
+}
