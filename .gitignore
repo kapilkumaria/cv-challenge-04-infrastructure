@@ -35,4 +35,4 @@ override.tf.json
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
 
-# End of https://www.toptal.com/developers/gitignore/api/terraform
+# End of https://www.toptal.com/developers/gitignore/api/terraformterraform/modules/bastion/bastion_key.pem
