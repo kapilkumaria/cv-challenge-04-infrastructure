@@ -7,10 +7,15 @@ variable "aws_region" {
 }
 
 variable "aws_profile" {
-  description = "The AWS region to deploy resources in."
-  type        = string
+  description = "The AWS CLI profile to use for authentication."
   default     = "MyAWS"
 }
+
+# variable "aws_profile" {
+#   description = "The AWS region to deploy resources in."
+#   type        = string
+#   default     = "MyAWS"
+# }
 
 variable "vpc_cidr" {
   description = "The CIDR block for the VPC."

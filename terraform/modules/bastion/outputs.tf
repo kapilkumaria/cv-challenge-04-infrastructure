@@ -39,3 +39,8 @@ output "bastion_private_key" {
   value       = tls_private_key.bastion_key.private_key_pem
   sensitive   = true
 }
+
+output "bastion_key_name" {
+  description = "The name of the key pair for the bastion host."
+  value       = aws_key_pair.bastion_key.key_name
+}
