@@ -29,7 +29,7 @@ resource "aws_instance" "bastion" {
   ami           = "ami-0c02fb55956c7d316" # Amazon Linux 2
   instance_type = var.instance_type
   # key_name      = aws_key_pair.bastion_key.key_name # Use the generated key pair
-  key_name      = aws_key_pair.bastion_key # Use the generated key pair
+  key_name      = aws_key_pair.bastion_key.key_name # Use the generated key pair
 
   subnet_id     = var.subnet_id
 
@@ -52,7 +52,8 @@ resource "aws_instance" "bastion" {
     Name = "bastion-host"
   }
 
-  security_groups = [aws_security_group.bastion.id]
+  # security_groups = [aws_security_group.bastion.id]
+  vpc_security_group_ids = [aws_security_group.bastion.id]
 }
 
 resource "aws_security_group" "bastion" {

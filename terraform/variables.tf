@@ -6,6 +6,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_profile" {
+  description = "The AWS region to deploy resources in."
+  type        = string
+  default     = "MyAWS"
+}
+
 variable "vpc_cidr" {
   description = "The CIDR block for the VPC."
   type        = string
@@ -42,10 +48,10 @@ variable "instance_types" {
   default     = ["t3.medium"]
 }
 
-variable "key_pair" {
-  description = "The name of the SSH key pair to use for the bastion host."
-  type        = string
-}
+# variable "key_pair" {
+#   description = "The name of the SSH key pair to use for the bastion host."
+#   type        = string
+# }
 
 variable "instance_type" {
   description = "The EC2 instance type for the bastion host."
