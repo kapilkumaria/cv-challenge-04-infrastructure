@@ -23,3 +23,9 @@ variable "allowed_cidr" {
   description = "List of CIDR blocks allowed to SSH into the bastion host"
   type        = list(string)
 }
+
+variable "private_key_path" {
+  description = "The path to the private key file for the bastion host."
+  type        = string
+  default     = "~/.ssh/bastion_key.pem"
+}

@@ -26,4 +26,5 @@ module "bastion" {
   instance_type = var.instance_type          # Bastion instance type
   allowed_cidr  = [module.eks.vpc_cidr] # Ensure this is a list
   # allowed_cidr  = module.eks.vpc_cidr        # Reference the VPC CIDR from the EKS module
+  private_key_path  = "~/.ssh/bastion_key.pem"
 }

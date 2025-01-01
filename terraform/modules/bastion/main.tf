@@ -13,7 +13,9 @@ resource "aws_key_pair" "bastion_key" {
 # Save Private Key Locally
 resource "local_file" "bastion_private_key" {
   content  = tls_private_key.bastion_key.private_key_pem
-  filename = "${path.module}/bastion_key.pem"
+  filename = var.private_key_path
+  # filename = "~/.ssh/bastion_key.pem" # Updated secure path
+  # filename = "${path.module}/bastion_key.pem"
 }
 
 # Set Permissions on Private Key
