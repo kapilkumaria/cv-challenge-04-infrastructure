@@ -29,3 +29,9 @@ variable "private_key_path" {
   type        = string
   default     = "~/.ssh/bastion_key.pem"
 }
+
+variable "cluster_name" {
+  description = "The path to the private key file for the bastion host."
+  type        = string
+  default     = "eks-cluster"
+}
