@@ -82,40 +82,41 @@ resource "aws_instance" "bastion" {
 
   vpc_security_group_ids = [aws_security_group.bastion.id]
 
-  provisioner "file" {
-    source      = "/home/kapil/.kube/config"
-    destination = "/home/ubuntu/.kube/config"
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file("~/.ssh/id_rsa")
-      host        = self.public_ip
-    }
-  }
-
-#   provisioner "remote-exec" {
-#     inline = [
-#       "mkdir -p ~/.kube",
-#       "mv /home/ubuntu/.kube/config ~/.kube/config",
-#       "chmod 600 ~/.kube/config",
-#       "sleep 120",  # Wait for 2 minutes
-#       "git clone https://github.com/kapilkumaria/cv-challenge-04-infrastructure.git /home/ubuntu/cv-challenge",
-#       "cd /home/ubuntu/cv-challenge/ansible",
-#       # "ansible-playbook -i inventory/inventory.ini playbooks/install_argocd.yaml",
-#       # "ansible-playbook -i inventory/inventory.ini playbooks/deploy_efk.yaml",
-#       # "ansible-playbook -i inventory/inventory.ini playbooks/setup_monitoring.yaml",
-#       # "ansible-playbook -i inventory/inventory.ini playbooks/setup_apps.yaml"
-#     ]
+  # Commented this LATEST
+#   provisioner "file" {
+#     source      = "/home/kapil/.kube/config"
+#     destination = "/home/ubuntu/.kube/config"
 
 #     connection {
 #       type        = "ssh"
 #       user        = "ubuntu"
 #       private_key = file("~/.ssh/id_rsa")
 #       host        = self.public_ip
-#       timeout     = "10m"
 #     }
 #   }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p ~/.kube",
+      "mv /home/ubuntu/.kube/config ~/.kube/config",
+      "chmod 600 ~/.kube/config",
+      "sleep 120",  # Wait for 2 minutes
+      "git clone https://github.com/kapilkumaria/cv-challenge-04-infrastructure.git /home/ubuntu/cv-challenge",
+      "cd /home/ubuntu/cv-challenge/ansible",
+      # "ansible-playbook -i inventory/inventory.ini playbooks/install_argocd.yaml",
+      # "ansible-playbook -i inventory/inventory.ini playbooks/deploy_efk.yaml",
+      # "ansible-playbook -i inventory/inventory.ini playbooks/setup_monitoring.yaml",
+      # "ansible-playbook -i inventory/inventory.ini playbooks/setup_apps.yaml"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("~/.ssh/id_rsa")
+      host        = self.public_ip
+      timeout     = "10m"
+    }
+  }
 
   provisioner "remote-exec" {
     inline = [
