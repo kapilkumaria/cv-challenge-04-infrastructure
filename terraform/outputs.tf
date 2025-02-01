@@ -1,28 +1,18 @@
 ################################################################################
-# TERRAFORM OUTPUTS FILE
+# ROOT OUTPUTS.TF
 ################################################################################
 
-output "eks_cluster_id" {
-  description = "The ID of the EKS cluster."
-  value       = module.eks.eks_cluster_id
-}
-
 output "eks_cluster_endpoint" {
-  description = "The endpoint of the EKS cluster."
+  description = "Endpoint for the EKS cluster"
   value       = module.eks.eks_cluster_endpoint
 }
 
-output "eks_cluster_ca" {
-  description = "The certificate authority data for the cluster."
-  value       = module.eks.eks_cluster_ca
+output "argocd_server_url" {
+  description = "External URL for ArgoCD Server"
+  value       = module.argocd.argocd_server_url
 }
 
-# output "alb_ingress_hostname" {
-#   description = "The ALB hostname for accessing services."
-#   value       = module.alb_ingress.alb_hostname
-# }
-
-# output "route53_record" {
-#   description = "The Route53 DNS record for the custom domain."
-#   value       = module.route53.domain_name
-# }
+output "argocd_application_name" {
+  description = "Name of the deployed ArgoCD application"
+  value       = module.argocd.argocd_application_name
+}

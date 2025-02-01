@@ -1,68 +1,93 @@
 ################################################################################
-# TERRAFORM VARIABLES FILE
+# ROOT VARIABLES.TF
 ################################################################################
 
 variable "aws_region" {
-  description = "The AWS region to deploy resources in."
+  description = "AWS region to deploy resources"
   type        = string
   default     = "us-east-1"
 }
 
 variable "vpc_cidr" {
-  description = "The CIDR block for the VPC."
+  description = "CIDR block for the VPC"
   type        = string
   default     = "10.0.0.0/16"
 }
 
-variable "eks_cluster_name" {
-  description = "The name of the EKS cluster."
-  type        = string
-  default     = "eks-cluster"
-}
-
 variable "subnet_count" {
-  description = "The number of subnets to create."
+  description = "Number of subnets to create"
   type        = number
   default     = 2
 }
 
+variable "eks_cluster_name" {
+  description = "Name of the EKS cluster"
+  type        = string
+  default     = "eks-cluster"
+}
+
 variable "node_desired_size" {
-  description = "The desired size of the node group."
+  description = "Desired number of worker nodes"
   type        = number
   default     = 2
 }
 
 variable "node_max_size" {
-  description = "The maximum size of the node group."
+  description = "Maximum number of worker nodes"
   type        = number
   default     = 3
 }
 
 variable "node_min_size" {
-  description = "The minimum size of the node group."
+  description = "Minimum number of worker nodes"
   type        = number
   default     = 1
 }
 
 variable "instance_types" {
-  description = "The EC2 instance types for the node group."
+  description = "Instance types for worker nodes"
   type        = list(string)
   default     = ["t3.medium"]
 }
 
-variable "domain_name" {
-  description = "The domain name for the ingress."
+variable "argocd_namespace" {
+  description = "Namespace to deploy ArgoCD"
   type        = string
-  default     = "kapilkumaria.com"
+  default     = "argocd"
+}
+
+variable "argocd_version" {
+  description = "Version of the ArgoCD Helm chart"
+  type        = string
+  default     = "5.46.8"
+}
+
+variable "argocd_app_name" {
+  description = "Name of the ArgoCD application"
+  type        = string
+  default     = "my-app"
+}
+
+variable "argocd_repo_url" {
+  description = "Git repository URL for the ArgoCD application"
+  type        = string
+  default     = "https://github.com/myorg/myrepo.git"
+}
+
+variable "argocd_app_path" {
+  description = "Path to the application in the Git repository"
+  type        = string
+  default     = "path/to/app"
 }
 
 variable "ssl_certificate_arn" {
-  description = "The ARN of the SSL certificate for HTTPS."
+  description = "The ARN of the SSL certificate for the load balancer"
   type        = string
+  default     = ""
 }
 
 variable "hosted_zone_id" {
-  description = "The Route53 hosted zone ID."
+  description = "The ID of the Route 53 hosted zone"
   type        = string
+  default     = ""
 }
-

@@ -4,7 +4,7 @@
 
 output "argocd_server_url" {
   description = "External URL for ArgoCD Server"
-  value       = "http://${helm_release.argocd.name}.${var.namespace}.svc.cluster.local:80"
+  value       = data.kubernetes_service.argocd_server.status[0].load_balancer[0].ingress[0].hostname
 }
 
 output "argocd_application_name" {

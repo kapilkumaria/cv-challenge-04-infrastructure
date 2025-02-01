@@ -18,6 +18,18 @@ module "eks" {
   instance_types  = var.instance_types
 }
 
+module "argocd" {
+  source = "./modules/argocd"
+
+  namespace     = var.argocd_namespace
+  argocd_version = var.argocd_version
+  app_name      = var.argocd_app_name
+  repo_url      = var.argocd_repo_url
+  app_path      = var.argocd_app_path
+
+  depends_on = [module.eks]
+}
+
 # module "efk" {
 #   source    = "./modules/efk"
 #   depends_on = [module.eks]
