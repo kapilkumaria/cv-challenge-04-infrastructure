@@ -1,14 +1,19 @@
+################################################################################
+# TERRAFORM ARGOCD MODULE MAIN CONFIGURATION FILE
+################################################################################
+
 resource "kubernetes_namespace" "argocd" {
   metadata {
-    name = "argocd"
+    name = var.namespace
   }
 }
 
+# Deploy ArgoCD using Helm
 resource "helm_release" "argocd" {
   name       = "argocd"
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argo-cd"
-  version    = "5.46.8"
+  version    = var.argocd_version
   namespace  = kubernetes_namespace.argocd.metadata[0].name
 
   set {
@@ -17,20 +22,21 @@ resource "helm_release" "argocd" {
   }
 }
 
+# Deploy ArgoCD Application
 resource "kubernetes_manifest" "argocd_application" {
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
     metadata = {
-      name      = "my-app"
-      namespace = kubernetes_namespace.argocd.metadata[0].name
+      name      = var.app_name
+      namespace = var.namespace
     }
     spec = {
       project = "default"
       source = {
-        repoURL        = "https://github.com/myorg/myrepo.git"
+        repoURL        = var.repo_url
         targetRevision = "HEAD"
-        path           = "path/to/app"
+        path           = var.app_path
       }
       destination = {
         server    = "https://kubernetes.default.svc"

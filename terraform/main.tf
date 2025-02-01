@@ -1,58 +1,59 @@
-provider "aws" {
-  region  = var.aws_region
-  profile = "MyAWS"
-}
+################################################################################
+# TERRAFORM MAIN CONFIGURATION FILE
+################################################################################
 
-provider "kubernetes" {
-  config_path = "~/.kube/config" # Ensure this points to your kubeconfig file
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.eks_cluster_id
 }
-
-provider "helm" {
-  kubernetes {
-    config_path = "~/.kube/config" # Ensure this points to your kubeconfig file
-  }
-}
-
 
 module "eks" {
-  source            = "./modules/eks"
-  aws_region        = var.aws_region
-  eks_role_arn      = "arn:aws:iam::931058976119:role/terraform-execution-role" # Pass the role
-  vpc_cidr          = var.vpc_cidr
-  eks_cluster_name  = var.eks_cluster_name
+  source          = "./modules/eks"
+  aws_region      = var.aws_region
+  # cluster_name    = var.eks_cluster_name
+  vpc_cidr        = var.vpc_cidr
+  subnet_count    = var.subnet_count
+  node_min_size   = var.node_min_size
+  node_max_size   = var.node_max_size
   node_desired_size = var.node_desired_size
-  node_max_size     = var.node_max_size
-  node_min_size     = var.node_min_size  
+  instance_types  = var.instance_types
 }
 
-# EFK Stack Module
-module "efk" {
-  source = "./modules/efk"
+# module "efk" {
+#   source    = "./modules/efk"
+#   depends_on = [module.eks]
+# }
 
-  # Variables for the EFK stack
-  namespace = "logging" # Namespace for EFK stack
-}
+# module "argocd" {
+#   source    = "./modules/argocd"
+#   depends_on = [module.eks]
+# }
 
-# ArgoCD Module
-module "argocd" {
-  source = "./modules/argocd"
+# module "alb_ingress" {
+#   source              = "./modules/alb_ingress"
+#   eks_cluster_name    = var.eks_cluster_name
+#   domain_name         = var.domain_name
+#   ssl_certificate_arn = var.ssl_certificate_arn
+#   hosted_zone_id      = var.hosted_zone_id
+# }
 
-  # Variables for ArgoCD
-  namespace = "argocd" # Namespace for ArgoCD
-  app_name  = "my-app" # Name of the ArgoCD application
-  repo_url  = "https://github.com/myorg/myrepo.git" # Git repo URL
-  app_path  = "path/to/app" # Path to the application in the Git repo
-}
+# module "route53" {
+#   source                  = "./modules/route53"
+#   domain_name             = var.domain_name
+#   hosted_zone_id          = var.hosted_zone_id
+#   ingress_nginx_hostname  = module.nginx_ingress.ingress_nginx_hostname  # ✅ Use correct output
+#   ingress_nginx_zone_id   = module.nginx_ingress.ingress_nginx_zone_id  # ✅ Use correct output
+# }
 
-# Outputs
-output "elasticsearch_endpoint" {
-  value = module.efk.elasticsearch_endpoint
-}
 
-output "kibana_endpoint" {
-  value = module.efk.kibana_endpoint
-}
+# module "nginx_ingress" {
+#   source         = "./modules/ingress"
+#   domain_name    = var.domain_name
+#   hosted_zone_id = var.hosted_zone_id  
+# }
 
-output "argocd_server_url" {
-  value = module.argocd.argocd_server_url
-}
+
+
+
+
+
+
