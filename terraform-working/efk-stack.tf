@@ -146,11 +146,12 @@ EOF
 
 # Deploy Fluentd using Helm
 resource "helm_release" "fluentd" {
+  timeout   = 600  # Add this line
   name       = "fluentd"
   namespace  = kubernetes_namespace.elastic_stack.metadata[0].name
   repository = "https://fluent.github.io/helm-charts"
   chart      = "fluentd"
-  version    = "0.3.0"
+  version    = "0.5.0" # ✅ Use the latest version available
 
   values = [
     <<EOF
@@ -162,14 +163,29 @@ daemonset:
 fluentd:
   output:
     type: "elasticsearch"
-    host: "elasticsearch.elastic-stack.svc.cluster.local"
+    
+    host: "elasticsearch-master.elastic-stack.svc.cluster.local"  # Check Elasticsearch service name
     port: 9200
     logstash_format: true
+rbac:
+  create: true
+serviceAccount:
+  create: true
+  name: fluentd-service-account
+podSecurityPolicy:
+  create: false # ✅ Explicitly disable PodSecurityPolicy
 EOF
   ]
 
-  depends_on = [helm_release.elasticsearch] # Ensure Elasticsearch is ready before Fluentd
+  depends_on = [
+  helm_release.elasticsearch,
+  helm_release.aws_ebs_csi_driver,
+  kubernetes_namespace.elastic_stack
+  ]
+
+  # depends_on = [helm_release.elasticsearch]
 }
+
 
 # Deploy Kibana using Helm
 resource "helm_release" "kibana" {
