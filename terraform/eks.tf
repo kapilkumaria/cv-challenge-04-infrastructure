@@ -26,7 +26,7 @@ data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
 }
 
-resource "terraform_data" "kubectl" {
+resource "null_resource" "kubectl" {
 
   provisioner "local-exec" {
     command = "aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster"

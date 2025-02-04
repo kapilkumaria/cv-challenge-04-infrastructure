@@ -9,5 +9,5 @@ resource "helm_release" "argocd" {
     value = "LoadBalancer"
   }
 
-  depends_on = [module.eks, terraform_data.kubectl]
+  depends_on = [module.eks, null_resource.kubectl]
 }
