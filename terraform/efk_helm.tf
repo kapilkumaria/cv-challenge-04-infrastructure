@@ -4,7 +4,7 @@ resource "helm_release" "elasticsearch" {
   chart      = "elasticsearch"
   namespace  = "logging"
 
-  depends_on = [module.eks]  # ✅ EKS must be ready before deploying Elasticsearch
+  depends_on = [module.eks, terraform_data.kubectl]
 }
 
 resource "helm_release" "fluent-bit" {
@@ -13,7 +13,7 @@ resource "helm_release" "fluent-bit" {
   chart      = "fluent-bit"
   namespace  = "logging"
 
-  depends_on = [module.eks]
+  depends_on = [module.eks, terraform_data.kubectl]
 }
 
 resource "helm_release" "kibana" {
@@ -22,5 +22,5 @@ resource "helm_release" "kibana" {
   chart      = "kibana"
   namespace  = "logging"
 
-  depends_on = [module.eks]
+  depends_on = [module.eks, terraform_data.kubectl]
 }

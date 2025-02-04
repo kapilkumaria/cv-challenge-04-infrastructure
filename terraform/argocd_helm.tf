@@ -9,5 +9,5 @@ resource "helm_release" "argocd" {
     value = "LoadBalancer"
   }
 
-  depends_on = [module.eks]  # ✅ Ensure EKS is ready before installing Helm chart
+  depends_on = [module.eks, terraform_data.kubectl]
 }
