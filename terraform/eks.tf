@@ -12,7 +12,7 @@ module "eks_managed_node_group" {
   source = "terraform-aws-modules/eks/aws//modules/eks-managed-node-group"
 
   cluster_name = module.eks.cluster_name
-  cluster_service_cidr = module.eks.cluster_service_cidr # ✅ Add this line
+  cluster_service_cidr = module.eks.cluster_service_cidr 
 
   name = "eks-workers"
   subnet_ids = module.vpc.private_subnets
@@ -22,7 +22,16 @@ module "eks_managed_node_group" {
   instance_types = ["t3.medium"]
 }
 
-# ✅ Add this missing data resource for authentication
 data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_name
+}
+
+resource "null_resource" "kubectl" {
+
+  provisioner "local-exec" {
+    command = "aws eks --region us-east-1 update-kubeconfig --name my-eks-cluster"
+  }  
+
+  depends_on = [module.eks, module.eks_managed_node_group]
+
 }
