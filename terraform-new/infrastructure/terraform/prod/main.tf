@@ -31,6 +31,14 @@ module "eks_deps" {
   }
 }
 
+# 🔥 ATTACH AmazonEBSCSIDriverPolicy TO WORKER NODES 🔥
+resource "aws_iam_role_policy_attachment" "eks_worker_node_ebs" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  # role       = module.eks_deps.eks_node_role_arn
+  role       = "prod-nodes-eks-node-group-20250205163001903200000004"
+
+}
+
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   cluster_name    = "prod-cluster"
@@ -45,6 +53,7 @@ module "eks" {
     eks-pod-identity-agent = {}
     kube-proxy             = {}
     vpc-cni                = {}
+    aws-ebs-csi-driver     = {} # 🔥 ADD THIS LINE
   }
 
 
