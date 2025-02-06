@@ -5,9 +5,9 @@ resource "kubernetes_namespace" "kube_system" {
   }
 
   depends_on = [
-    aws_eks_node_group.ng-private, # Added dependency on node group to ensure the node group is created before the helm chart is deployed
-    aws_eks_cluster.eks-cluster, # Added dependency on EKS cluster to ensure the EKS cluster is created before the helm chart is deployed
-    terraform_data.kubectl, # Added dependency on kubectl data source to ensure kubectl is available before the helm chart is deployed
+    aws_eks_node_group.ng-private, 
+    aws_eks_cluster.eks-cluster, 
+    terraform_data.kubectl, 
   ]
 }
 
@@ -48,8 +48,8 @@ resource "helm_release" "nginx_ingress" {
   }
   
   depends_on = [
-    aws_eks_node_group.ng-private, # Added dependency on node group to ensure the node group is created before the helm chart is deployed
-    aws_eks_cluster.eks-cluster, # Added dependency on EKS cluster to ensure the EKS cluster is created before the helm chart is deployed
-    terraform_data.kubectl, # Added dependency on kubectl data source to ensure kubectl is available before the helm chart is deployed
+    aws_eks_node_group.ng-private, 
+    aws_eks_cluster.eks-cluster, 
+    terraform_data.kubectl, 
   ]
 }

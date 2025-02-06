@@ -3,8 +3,11 @@ resource "kubernetes_namespace" "argocd" {
     name = "argocd"
   }
 
-  # depends_on = [null_resource.wait_for_eks]
-  depends_on = [null_resource.wait_for_kubeconfig]
+  depends_on = [
+    aws_eks_node_group.ng-private, 
+    aws_eks_cluster.eks-cluster, 
+    terraform_data.kubectl, 
+  ]
   
 }
 
@@ -18,6 +21,10 @@ resource "helm_release" "argocd" {
     value = "ClusterIP"
   }
 
-  depends_on = [aws_eks_cluster.eks-cluster, null_resource.wait_for_kubeconfig]
+  depends_on = [
+    aws_eks_node_group.ng-private, 
+    aws_eks_cluster.eks-cluster, 
+    terraform_data.kubectl, 
+  ]
   
 }

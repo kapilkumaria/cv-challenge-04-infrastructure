@@ -3,7 +3,11 @@ resource "kubernetes_namespace" "logging" {
     name = "logging"
   }
 
-  depends_on = [aws_eks_cluster.eks-cluster]
+  depends_on = [
+    aws_eks_node_group.ng-private, 
+    aws_eks_cluster.eks-cluster, 
+    terraform_data.kubectl, 
+  ]
 }
 
 resource "helm_release" "elasticsearch" {
@@ -32,7 +36,11 @@ resource "helm_release" "elasticsearch" {
     value = "10Gi"
   }
 
-  depends_on = [kubernetes_namespace.logging, null_resource.wait_for_kubeconfig]
+  depends_on = [
+    aws_eks_node_group.ng-private, 
+    aws_eks_cluster.eks-cluster, 
+    terraform_data.kubectl, 
+  ]
 }
 
 resource "helm_release" "fluent-bit" {
@@ -41,7 +49,11 @@ resource "helm_release" "fluent-bit" {
   chart      = "fluent-bit"
   namespace  = "logging"
 
-  depends_on = [kubernetes_namespace.logging, null_resource.wait_for_kubeconfig]
+  depends_on = [
+    aws_eks_node_group.ng-private, 
+    aws_eks_cluster.eks-cluster, 
+    terraform_data.kubectl, 
+  ]
 }
 
 resource "helm_release" "kibana" {
@@ -50,5 +62,9 @@ resource "helm_release" "kibana" {
   chart      = "kibana"
   namespace  = "logging"
 
-  depends_on = [kubernetes_namespace.logging, null_resource.wait_for_kubeconfig]
+  depends_on = [
+    aws_eks_node_group.ng-private, 
+    aws_eks_cluster.eks-cluster, 
+    terraform_data.kubectl, 
+  ]
 }
