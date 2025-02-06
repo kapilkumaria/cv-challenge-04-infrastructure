@@ -18,6 +18,6 @@ resource "helm_release" "argocd" {
     value = "ClusterIP"
   }
 
-  depends_on = [kubernetes_namespace.argocd]
+  depends_on = [aws_eks_cluster.eks-cluster, null_resource.wait_for_kubeconfig]
   
 }

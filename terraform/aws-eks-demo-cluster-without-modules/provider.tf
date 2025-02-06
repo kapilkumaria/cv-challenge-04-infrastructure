@@ -38,31 +38,20 @@ data "aws_eks_cluster" "cluster" {
   depends_on = [aws_eks_cluster.eks-cluster]
 }
 
-data "aws_eks_cluster_auth" "cluster" {
-  name = aws_eks_cluster.eks-cluster.name
-  depends_on = [aws_eks_cluster.eks-cluster]
-}
-
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
+  host                   = aws_eks_cluster.eks-cluster.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.eks-cluster.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.cluster.token
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)    
 }
-
-# data "aws_eks_cluster" "cluster" {
-#   name = "my-eks-cluster"
-#   depends_on = [aws_eks_cluster.eks-cluster]
-# }
-
-# data "aws_eks_cluster_auth" "cluster" {
-#   name = "my-eks-cluster"
-#   depends_on = [aws_eks_cluster.eks-cluster]
-# }
 
 provider "helm" {
   kubernetes {
-    host                   = data.aws_eks_cluster.cluster.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+    host                   = aws_eks_cluster.eks-cluster.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.eks-cluster.certificate_authority[0].data)
     token                  = data.aws_eks_cluster_auth.cluster.token
-  }  
+  }
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = aws_eks_cluster.eks-cluster.name
 }

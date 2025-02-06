@@ -7,8 +7,6 @@ resource "kubernetes_namespace" "kube_system" {
   depends_on = [aws_eks_cluster.eks-cluster]
 }
 
-
-
 resource "helm_release" "nginx_ingress" {
   name       = "nginx-ingress"
   repository = "https://kubernetes.github.io/ingress-nginx"
@@ -45,7 +43,5 @@ resource "helm_release" "nginx_ingress" {
     value = "k8s.io/ingress-nginx"
   }
   
-  # depends_on = [aws_eks_cluster.eks-cluster]
-  # depends_on = [aws_eks_cluster.eks-cluster, kubernetes_namespace.kube_system]
-  depends_on = [null_resource.wait_for_eks]
+  depends_on = [aws_eks_cluster.eks-cluster, null_resource.wait_for_kubeconfig]
 }

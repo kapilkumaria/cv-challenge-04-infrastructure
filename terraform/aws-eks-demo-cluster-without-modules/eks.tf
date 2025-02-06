@@ -1,50 +1,31 @@
-# resource "null_resource" "wait_for_eks" {
-#   depends_on = [aws_eks_cluster.eks-cluster]
-
-#   provisioner "local-exec" {
-#     command = <<EOT
-#       echo "Waiting for EKS to be ready..."
-#       for i in {1..10}; do
-#         if aws eks update-kubeconfig --name my-eks-cluster --region us-east-1; then
-#           echo "EKS is ready!"
-#           exit 0
-#         fi
-#         echo "Retrying in 20 seconds..."
-#         sleep 20
-#       done
-#       echo "EKS did not become ready in time"
-#       exit 1
-#     EOT
-#   }
-# }
-
 resource "null_resource" "wait_for_eks" {
   depends_on = [aws_eks_cluster.eks-cluster]
 
   provisioner "local-exec" {
     command = <<EOT
-      echo "Waiting for EKS to be ready..."
-      MAX_ATTEMPTS=30
-      INTERVAL=30
+  echo "Waiting for EKS to be ready..."
+  MAX_ATTEMPTS=30
+  INTERVAL=30
 
-      for ((i=1; i<=MAX_ATTEMPTS; i++)); do
-        echo "Attempt $i/$MAX_ATTEMPTS: Checking EKS status..."
-        
-        if aws eks update-kubeconfig --name my-eks-cluster --region us-east-1; then
-          echo "✅ EKS is ready!"
-          exit 0
-        fi
+  for ((i=1; i<=MAX_ATTEMPTS; i++)); do
+    echo "Attempt $i/$MAX_ATTEMPTS: Checking EKS status..."
+    
+    CLUSTER_STATUS=$(aws eks describe-cluster --name my-eks-cluster --region us-east-1 --query "cluster.status" --output text)
+    if [ "$CLUSTER_STATUS" = "ACTIVE" ]; then
+      echo "✅ EKS is ready!"
+      aws eks update-kubeconfig --name my-eks-cluster --region us-east-1
+      exit 0
+    fi
 
-        echo "❌ EKS not ready yet. Retrying in $INTERVAL seconds..."
-        sleep $INTERVAL
-      done
+    echo "❌ EKS not ready yet. Retrying in $INTERVAL seconds..."
+    sleep $INTERVAL
+  done
 
-      echo "🚨 ERROR: EKS did not become ready after $((MAX_ATTEMPTS * INTERVAL / 60)) minutes."
-      exit 1
-    EOT
+  echo "🚨 ERROR: EKS did not become ready after $((MAX_ATTEMPTS * INTERVAL / 60)) minutes."
+  exit 1
+EOT
   }
 }
-
 
 resource "aws_eks_cluster" "eks-cluster" {
   name = var.cluster_name
@@ -90,39 +71,34 @@ resource "aws_eks_cluster" "eks-cluster" {
 
 }
 
-# ✅ Ensure EKS is ready and kubeconfig is updated before Terraform uses Helm
 resource "null_resource" "wait_for_kubeconfig" {
-  depends_on = [null_resource.wait_for_eks]
+  depends_on = [aws_eks_cluster.eks-cluster]
 
   provisioner "local-exec" {
     command = <<EOT
-      echo "Waiting for kubeconfig to be set up..."
-      sleep 60  # Delay to ensure kubeconfig is fully updated
+      echo "Waiting for EKS cluster to be ready..."
+      MAX_ATTEMPTS=30
+      INTERVAL=30
+
+      for ((i=1; i<=MAX_ATTEMPTS; i++)); do
+        echo "Attempt $i/$MAX_ATTEMPTS: Checking EKS status..."
+        
+        CLUSTER_STATUS=$(aws eks describe-cluster --name ${aws_eks_cluster.eks-cluster.name} --region ${var.region} --query "cluster.status" --output text)
+        if [ "$CLUSTER_STATUS" = "ACTIVE" ]; then
+          echo "✅ EKS is ready!"
+          aws eks update-kubeconfig --name ${aws_eks_cluster.eks-cluster.name} --region ${var.region}
+          exit 0
+        fi
+
+        echo "❌ EKS not ready yet. Retrying in $INTERVAL seconds..."
+        sleep $INTERVAL
+      done
+
+      echo "🚨 ERROR: EKS did not become ready after $((MAX_ATTEMPTS * INTERVAL / 60)) minutes."
+      exit 1
     EOT
   }
 }
-
-# resource "null_resource" "wait_for_eks" {
-#   depends_on = [aws_eks_cluster.eks-cluster]
-
-#   provisioner "local-exec" {
-#     command = <<EOT
-#       echo "Waiting for EKS to be ready..."
-#       for i in {1..10}; do
-#         if aws eks update-kubeconfig --name my-eks-cluster --region us-east-1; then
-#           echo "EKS is ready!"
-#           exit 0
-#         fi
-#         echo "Retrying in 20 seconds..."
-#         sleep 20
-#       done
-#       echo "EKS did not become ready in time"
-#       exit 1
-#     EOT
-#   }
-# }
-
-
 
 resource "aws_iam_role" "cluster" {
   name = "eks-cluster-role"
@@ -152,4 +128,3 @@ resource "aws_iam_role_policy_attachment" "eks-AmazonEKSVPCResourceController" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
   role       = aws_iam_role.cluster.name
 }
-

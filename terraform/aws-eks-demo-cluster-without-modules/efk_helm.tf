@@ -32,7 +32,7 @@ resource "helm_release" "elasticsearch" {
     value = "10Gi"
   }
 
-  depends_on = [kubernetes_namespace.logging]
+  depends_on = [kubernetes_namespace.logging, null_resource.wait_for_kubeconfig]
 }
 
 resource "helm_release" "fluent-bit" {
@@ -41,8 +41,7 @@ resource "helm_release" "fluent-bit" {
   chart      = "fluent-bit"
   namespace  = "logging"
 
-  # depends_on = [kubernetes_namespace.logging]
-  depends_on = [kubernetes_namespace.logging, helm_release.elasticsearch]
+  depends_on = [kubernetes_namespace.logging, null_resource.wait_for_kubeconfig]
 }
 
 resource "helm_release" "kibana" {
@@ -51,6 +50,5 @@ resource "helm_release" "kibana" {
   chart      = "kibana"
   namespace  = "logging"
 
-  # depends_on = [kubernetes_namespace.logging]
-  depends_on = [kubernetes_namespace.logging, helm_release.elasticsearch]
+  depends_on = [kubernetes_namespace.logging, null_resource.wait_for_kubeconfig]
 }
