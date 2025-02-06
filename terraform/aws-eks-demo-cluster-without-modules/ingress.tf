@@ -72,6 +72,8 @@ spec:
             port:
               number: 80
   YAML
+ 
+  depends_on = [helm_release.cert_manager]
 }
 
 resource "kubectl_manifest" "certificate" {

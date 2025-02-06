@@ -2,6 +2,8 @@ resource "kubernetes_namespace" "logging" {
   metadata {
     name = "logging"
   }
+
+  depends_on = [aws_eks_cluster.eks-cluster]
 }
 
 resource "helm_release" "elasticsearch" {
@@ -29,6 +31,8 @@ resource "helm_release" "elasticsearch" {
     name  = "persistence.size"
     value = "10Gi"
   }
+
+  depends_on = [kubernetes_namespace.logging]
 }
 
 resource "helm_release" "fluent-bit" {
@@ -37,8 +41,8 @@ resource "helm_release" "fluent-bit" {
   chart      = "fluent-bit"
   namespace  = "logging"
 
-  depends_on = [kubernetes_namespace.logging]
-
+  # depends_on = [kubernetes_namespace.logging]
+  depends_on = [kubernetes_namespace.logging, helm_release.elasticsearch]
 }
 
 resource "helm_release" "kibana" {
@@ -47,5 +51,6 @@ resource "helm_release" "kibana" {
   chart      = "kibana"
   namespace  = "logging"
 
-  depends_on = [kubernetes_namespace.logging]
+  # depends_on = [kubernetes_namespace.logging]
+  depends_on = [kubernetes_namespace.logging, helm_release.elasticsearch]
 }

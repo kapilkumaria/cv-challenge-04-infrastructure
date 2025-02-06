@@ -2,6 +2,10 @@ resource "kubernetes_namespace" "argocd" {
   metadata {
     name = "argocd"
   }
+
+  # depends_on = [null_resource.wait_for_eks]
+  depends_on = [null_resource.wait_for_kubeconfig]
+  
 }
 
 resource "helm_release" "argocd" {
@@ -15,4 +19,5 @@ resource "helm_release" "argocd" {
   }
 
   depends_on = [kubernetes_namespace.argocd]
+  
 }

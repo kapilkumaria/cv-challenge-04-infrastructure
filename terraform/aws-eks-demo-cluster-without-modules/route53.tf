@@ -20,6 +20,8 @@ resource "aws_route53_record" "ingress" {
     zone_id                = "Z26RNL4JYFTOTI"  # AWS Hosted Zone ID for NLBs
     evaluate_target_health = true
   }
+
+  depends_on = [kubectl_manifest.ingress]
 }
 
 # Redirect www.kapilkumaria.com to kapilkumaria.com
@@ -29,6 +31,8 @@ resource "aws_route53_record" "www_redirect" {
   type    = "CNAME"
   ttl     = 300
   records = ["kapilkumaria.com"]
+
+  depends_on = [aws_route53_record.ingress]  # Ensure main domain is configured before redirect
 }
 
 # Optional: Wildcard subdomain (*.kapilkumaria.com)
@@ -42,4 +46,6 @@ resource "aws_route53_record" "wildcard" {
     zone_id                = "Z26RNL4JYFTOTI"
     evaluate_target_health = true
   }
+
+  depends_on = [aws_route53_record.ingress]  # Ensure main domain is configured before redirect
 }
