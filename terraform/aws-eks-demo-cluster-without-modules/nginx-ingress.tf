@@ -43,5 +43,9 @@ resource "helm_release" "nginx_ingress" {
     value = "k8s.io/ingress-nginx"
   }
   
-  depends_on = [aws_eks_cluster.eks-cluster, null_resource.wait_for_kubeconfig]
+  depends_on = [
+    aws_eks_node_group.ng-private, # Added dependency on node group to ensure the node group is created before the helm chart is deployed
+    aws_eks_cluster.eks-cluster, # Added dependency on EKS cluster to ensure the EKS cluster is created before the helm chart is deployed
+    terraform_data.kubectl, # Added dependency on kubectl data source to ensure kubectl is available before the helm chart is deployed
+  ]
 }
