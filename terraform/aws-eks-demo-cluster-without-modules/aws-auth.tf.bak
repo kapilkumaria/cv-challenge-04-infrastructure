@@ -1,0 +1,23 @@
+resource "kubernetes_config_map_v1" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+  data = {
+    mapRoles = <<YAML
+- rolearn: arn:aws:iam::931058976119:role/eks-cluster-role
+  username: system:node:{{EC2PrivateDNSName}}
+  groups:
+    - system:bootstrappers
+    - system:nodes
+YAML
+
+    mapUsers = <<YAML
+- userarn: arn:aws:iam::931058976119:user/kapil
+  username: kapil
+  groups:
+    - system:masters
+YAML
+  }
+}
