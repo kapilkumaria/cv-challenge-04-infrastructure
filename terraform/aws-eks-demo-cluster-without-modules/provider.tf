@@ -12,6 +12,10 @@ terraform {
       source  = "hashicorp/helm"
       version = "2.17.0"
     }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "~> 1.14.0"  # ✅ Use a stable version
+    }
   }
   backend "s3" {
     bucket = "my-terraform-infra-bucket"
