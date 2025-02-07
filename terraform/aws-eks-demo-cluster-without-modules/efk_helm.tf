@@ -10,6 +10,21 @@ resource "kubernetes_namespace" "logging" {
   ]
 }
 
+resource "kubernetes_storage_class" "gp2_csi" {
+  metadata {
+    name = "gp2-csi"
+  }
+
+  storage_provisioner = "ebs.csi.aws.com"
+
+  parameters = {
+    type = "gp2"
+  }
+
+  reclaim_policy      = "Delete"
+  volume_binding_mode = "WaitForFirstConsumer"
+}
+
 resource "helm_release" "elasticsearch" {
   name       = "elasticsearch"
   repository = "https://helm.elastic.co"
@@ -36,7 +51,7 @@ resource "helm_release" "elasticsearch" {
 
   set {
     name  = "persistence.storageClass"
-    value = "gp2"
+    value = "gp2-csi"
   }
 
   set {
@@ -48,6 +63,7 @@ resource "helm_release" "elasticsearch" {
     aws_eks_node_group.ng-private, 
     aws_eks_cluster.eks-cluster, 
     terraform_data.kubectl, 
+    kubernetes_storage_class.gp2_csi  // Ensure StorageClass is created first
   ]
 }
 
