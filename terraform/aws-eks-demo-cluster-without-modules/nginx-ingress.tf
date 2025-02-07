@@ -1,15 +1,15 @@
 # Ensure kube-system namespace exists
-resource "kubernetes_namespace" "kube_system" {
-  metadata {
-    name = "kube-system"
-  }
+# resource "kubernetes_namespace" "kube_system" {
+#   metadata {
+#     name = "kube-system"
+#   }
 
-  depends_on = [
-    aws_eks_node_group.ng-private, 
-    aws_eks_cluster.eks-cluster, 
-    terraform_data.kubectl, 
-  ]
-}
+#   depends_on = [
+#     aws_eks_node_group.ng-private, 
+#     aws_eks_cluster.eks-cluster, 
+#     terraform_data.kubectl, 
+#   ]
+# }
 
 resource "helm_release" "nginx_ingress" {
   name       = "nginx-ingress"

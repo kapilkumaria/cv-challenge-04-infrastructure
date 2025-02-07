@@ -16,9 +16,17 @@ resource "helm_release" "elasticsearch" {
   chart      = "elasticsearch"
   namespace  = "logging"
 
+  timeout = 600  # Increase this as needed (time in seconds)
+
   set {
     name  = "replicas"
     value = "2"
+  }
+
+   # Example override (if supported by the chart)
+  set {
+    name  = "hooks.configmapHelmScripts.enabled"
+    value = "false"
   }
 
   set {
@@ -61,6 +69,11 @@ resource "helm_release" "kibana" {
   repository = "https://helm.elastic.co"
   chart      = "kibana"
   namespace  = "logging"
+
+   set {
+    name  = "hooks.preInstallServiceAccount.enabled"
+    value = "false"
+  }
 
   depends_on = [
     aws_eks_node_group.ng-private, 
