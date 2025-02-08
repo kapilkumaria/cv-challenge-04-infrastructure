@@ -25,6 +25,11 @@ resource "kubernetes_storage_class" "gp2_csi" {
   volume_binding_mode = "WaitForFirstConsumer"
 }
 
+resource "time_sleep" "wait_for_storage_class" {
+  depends_on = [kubernetes_storage_class.gp2_csi]
+  create_duration = "10s" # Adjust as needed
+}
+
 resource "helm_release" "elasticsearch" {
   name       = "elasticsearch"
   repository = "https://helm.elastic.co"
@@ -55,6 +60,11 @@ resource "helm_release" "elasticsearch" {
   }
 
   set {
+  name  = "persistence.storageClassName"
+  value = kubernetes_storage_class.gp2_csi.metadata[0].name # Explicitly reference the name 
+  }
+
+  set {
     name  = "persistence.size"
     value = "10Gi"
   }
@@ -63,7 +73,8 @@ resource "helm_release" "elasticsearch" {
     aws_eks_node_group.ng-private, 
     aws_eks_cluster.eks-cluster, 
     terraform_data.kubectl, 
-    kubernetes_storage_class.gp2_csi  // Ensure StorageClass is created first
+    kubernetes_storage_class.gp2_csi,  // Ensure StorageClass is created first
+    time_sleep.wait_for_storage_class,
   ]
 }
 
