@@ -43,7 +43,6 @@ resource "helm_release" "elasticsearch" {
     value = "2"
   }
 
-   # Example override (if supported by the chart)
   set {
     name  = "hooks.configmapHelmScripts.enabled"
     value = "false"
