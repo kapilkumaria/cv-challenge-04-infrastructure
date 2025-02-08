@@ -50,8 +50,8 @@ resource "helm_release" "elasticsearch" {
   }
 
   set {
-    name  = "persistence.storageClass"
-    value = "gp2-csi"
+  name  = "persistence.storageClassName"
+  value = "gp2-csi"
   }
 
   set {

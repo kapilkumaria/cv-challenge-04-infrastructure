@@ -56,20 +56,93 @@ resource "terraform_data" "kubectl" {
   ]
 }
 
+# resource "aws_iam_role" "ng-role" {
+#   name = "eks-private-node-group-role"
+
+#   assume_role_policy = jsonencode({
+#     Statement = [{
+#       Action = "sts:AssumeRole"
+#       Effect = "Allow"
+#       Principal = {
+#         Service = "ec2.amazonaws.com"
+#       }
+#     }]
+#     Version = "2012-10-17"
+#   })
+# }
+
+# # EKS Cluster
+# resource "aws_eks_cluster" "eks-cluster" {
+#   name = var.cluster_name
+
+#   access_config {
+#     authentication_mode = "API"
+#   }
+
+#   role_arn = aws_iam_role.cluster.arn
+#   version  = var.cluster_version
+#   vpc_config {
+#     endpoint_private_access = false
+#     endpoint_public_access  = true
+#     public_access_cidrs     = ["0.0.0.0/0"]
+#     subnet_ids = [
+#       aws_subnet.public-subnet-1.id,
+#       aws_subnet.public-subnet-2.id,
+#     ]
+#     security_group_ids = [
+#       aws_security_group.kubernetes_master.id
+#     ]
+#   }
+
+#   kubernetes_network_config {
+#     service_ipv4_cidr = "172.20.0.0/16"
+#   }
+
+#   depends_on = [
+#     aws_iam_role_policy_attachment.cluster_AmazonEKSClusterPolicy,
+#     aws_iam_role_policy_attachment.eks-AmazonEKSVPCResourceController
+#   ]
+
+#   tags = {
+#     Name = var.cluster_name
+#   }
+# }
+
+# Extract the OIDC provider URL from the EKS cluster
+locals {
+  oidc_provider_url = replace(aws_eks_cluster.eks-cluster.identity[0].oidc[0].issuer, "https://", "")
+}
+
+# Create the IAM role with updated trust relationship
 resource "aws_iam_role" "ng-role" {
   name = "eks-private-node-group-role"
 
   assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      }
-    }]
     Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = "arn:aws:iam::931058976119:oidc-provider/${local.oidc_provider_url}"
+        }
+        Condition = {
+          StringEquals = {
+            "${local.oidc_provider_url}:sub" : "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+          }
+        }
+      }
+    ]
   })
 }
+
 
 resource "aws_iam_role_policy_attachment" "example-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
@@ -95,3 +168,8 @@ resource "aws_iam_role_policy_attachment" "node_AmazonEBSCSIDriverPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
   role       = aws_iam_role.ng-role.name  # Ensure this references your worker node role
 }
+
+# resource "aws_iam_role_policy_attachment" "ebs_csi_iam_role_policy_attach" {
+#   policy_arn = aws_iam_policy.ebs_csi_iam_policy.arn
+#   role       = aws_iam_role.ng-role.name  # Ensure this references your worker node role
+# }
