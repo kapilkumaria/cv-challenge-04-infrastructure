@@ -1,3 +1,8 @@
+resource "time_sleep" "wait_for_cert_manager" {
+  depends_on      = [helm_release.cert_manager]
+  create_duration = "60s"  # Adjust as needed
+}
+
 resource "kubectl_manifest" "letsencrypt_cluster_issuer" {
   yaml_body = <<YAML
 apiVersion: cert-manager.io/v1
@@ -15,5 +20,11 @@ spec:
         ingress:
           class: nginx
   YAML
+
+    depends_on = [
+      helm_release.cert_manager,
+      # kubernetes_namespace.cert_manager,
+      time_sleep.wait_for_cert_manager,
+    ]
 }
 
