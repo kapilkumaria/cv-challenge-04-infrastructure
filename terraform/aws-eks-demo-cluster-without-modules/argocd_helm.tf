@@ -25,6 +25,7 @@ resource "helm_release" "argocd" {
     aws_eks_node_group.ng-private, 
     aws_eks_cluster.eks-cluster, 
     terraform_data.kubectl, 
+    kubernetes_namespace.argocd,
   ]
   
 }
