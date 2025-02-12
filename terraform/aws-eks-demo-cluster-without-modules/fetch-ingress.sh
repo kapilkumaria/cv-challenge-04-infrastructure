@@ -1,5 +1,5 @@
 #!/bin/bash
-INGRESS_NAME="my-ingress"
+INGRESS_NAME="argocd-ingress"
 NAMESPACE="argocd"
 
 # Get the Load Balancer hostname from Kubernetes Ingress
